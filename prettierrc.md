@@ -1,0 +1,1 @@
+le fichier prettier rc est juste la pour paramétrer l'extension prettier, ça n'a pas d'impact sur l'application
