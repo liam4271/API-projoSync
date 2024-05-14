@@ -13,15 +13,17 @@ const ProfileRechercheRoute = require('./routes/profileRecherche');
 const UtilisateurRoute = require('./routes/utilisateur');
 const AuthentificationRoute = require('./routes/authentification');
 const meRoute = require('./routes/me');
+const competenceRoute = require('./routes/competence');
 const checkJwt = require('./middleware/checkJwt');
 
 app.use('/authentification', AuthentificationRoute);
+app.use('/competence', competenceRoute);
 app.use('/me', checkJwt, meRoute);
 app.use('/projet', checkJwt, ProjetRoute);
-app.use('/candidature', CandidatureRoute);
-app.use('/invitation', InvitationRoute);
-app.use('/profileRecherche', ProfileRechercheRoute);
-app.use('/users', UtilisateurRoute);
+app.use('/candidature', checkJwt, CandidatureRoute);
+app.use('/invitation', checkJwt, InvitationRoute);
+app.use('/profileRecherche', checkJwt, ProfileRechercheRoute);
+app.use('/users', checkJwt, UtilisateurRoute);
 app.use((req, res) => {
   res.status(404).json({ status: 'error', message: 'Ressource introuvable' });
 });

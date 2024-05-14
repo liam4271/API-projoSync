@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-//Ajout de la gestion des credential directement dans le .env, plus sécurisé et pratique pour travailler sur différents appareils 
+//Ajout de la gestion des credential directement dans le .env, plus sécurisé et pratique pour travailler sur différents appareils
 
 module.exports = {
   development: {
@@ -9,6 +9,7 @@ module.exports = {
     database: process.env.DB_NAME,
     host: process.env.DB_HOST,
     dialect: process.env.DB_DIALECT,
+    logging: console.log
   },
   test: {
     username: 'root',
