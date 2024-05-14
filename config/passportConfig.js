@@ -15,6 +15,9 @@ module.exports = (passport) => {
         if (user) {
           return done(null, user);
         }
+        if (!user) {
+          throw new Error('Erreur de connexion');
+        }
       } catch (err) {
         return done(err);
       }

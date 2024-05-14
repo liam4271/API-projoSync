@@ -62,7 +62,18 @@ async function getAllProjetsDetails(req, res) {
 async function getProjetById(req, res) {
   const { id } = req.params;
   try {
-    const projet = await models.Projet.findByPk(id);
+    const projet = await models.Projet.findByPk(id, {
+      include: {
+        model: models.Profile_recherches,
+        as: 'profileProjet',
+        include: {
+          model: models.Competence,
+          as: 'profileCompetence',
+          attributes: { exclude: ['createdAt', 'updatedAt'] },
+        },
+        attributes: { exclude: ['competenceTrouve', 'id_projet', 'id_competence', 'createdAt', 'updatedAt'] },
+      },
+    });
     if (!projet) {
       return res.status(404).json({ message: 'Projet non trouvé' });
     }
@@ -162,6 +173,53 @@ const statusSuivis = async (req, res, next) => {
     next(err);
   }
 };
+
+const checkOwner = async (req, res, next) => {
+  const user = req.user;
+  const { id } = req.params;
+  try {
+    const projet = await models.Projet.findByPk(id);
+    const isOwner = projet.createur === user.id;
+    res.json(isOwner);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const checkIsInProjet = async (req, res, next) => {
+  try {
+    const user = req.user;
+    const { id } = req.params;
+    const data = await models.Utilisateur_projet.findOne({ where: { id_utilisateur: user.id, id_projet: id } });
+    const isInProjet = data ? true : false;
+    console.log(data);
+    res.json(isInProjet);
+  } catch (err) {
+    next(err);
+  }
+};
+const getAllProjetSuivi = async (req, res, next) => {
+  try {
+    const user = req.user;
+    const allProjetSuivi = await user.getSuivieProjet();
+    console.log(allProjetSuivi);
+    res.json(allProjetSuivi);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const getAllProjetParticipe = async (req, res, next) => {
+  try {
+    const user = req.user;
+    const allProjetMembre = await user.getUtilisateurProjet();
+    const allProjetCree = await models.Projet.findAll({ where: { createur: user.id } });
+    const allProjet = [...allProjetMembre, ...allProjetCree];
+    res.json(allProjet);
+  } catch (err) {
+    next(err);
+  }
+};
 module.exports = {
   createProjet,
   getAllProjets,
@@ -173,4 +231,8 @@ module.exports = {
   countSuivisProjet,
   suivreProjet,
   statusSuivis,
+  checkOwner,
+  getAllProjetSuivi,
+  getAllProjetParticipe,
+  checkIsInProjet,
 };

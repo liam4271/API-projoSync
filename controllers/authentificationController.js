@@ -24,10 +24,18 @@ const authLogin = async ({ email, password }) => {
   }
 };
 
-const registerFct = async ({ email, nom, prenom, tel, ville, mdp }) => {
+const registerFct = async ({ email, nom, prenom, tel, ville, mdp, id_competence }) => {
   try {
     const hashPassword = await bcrypt.hash(mdp, 10);
-    const utilisateur = await models.Utilisateur.create({ email, nom, prenom, tel, ville, mdp: hashPassword });
+    const utilisateur = await models.Utilisateur.create({
+      email,
+      nom,
+      prenom,
+      tel,
+      id_competence,
+      ville,
+      mdp: hashPassword,
+    });
     return utilisateur;
   } catch (err) {
     console.log(err);
@@ -41,7 +49,6 @@ const login = async (req, res, next) => {
     const token = await authLogin({ email, password: mdp });
     res.json({ token, status: 'success' });
   } catch (err) {
-    console.log(err);
     next(err);
   }
 };
@@ -49,7 +56,6 @@ const login = async (req, res, next) => {
 const register = async (req, res, next) => {
   try {
     const user = await registerFct(req.body);
-    // const token = await authLogin({ email: user.email, password: req.body.mdp });
     res.json({ user: { ...user.dataValues, mdp: undefined }, status: 'success' });
   } catch (err) {
     console.log(err);
